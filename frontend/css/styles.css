@@ -53,18 +53,8 @@ a {
   font-weight: 700;
 }
 
-.nav a:hover,
-.link-button:hover {
+.nav a:hover {
   color: var(--primary);
-}
-
-.link-button {
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  font: inherit;
 }
 
 .container {
@@ -384,41 +374,6 @@ select:focus {
 
 .pie-box {
   height: 320px;
-}
-
-.compact-item {
-  grid-template-columns: 1fr auto;
-  align-items: center;
-}
-
-.bars {
-  display: grid;
-  gap: 18px;
-  margin-top: 22px;
-}
-
-.bar-label {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 8px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.bar {
-  display: block;
-  height: 12px;
-  overflow: hidden;
-  background: #e5e7eb;
-  border-radius: 999px;
-}
-
-.bar span {
-  display: block;
-  height: 100%;
-  background: var(--primary);
-  border-radius: inherit;
 }
 
 .filters {

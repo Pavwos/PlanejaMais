@@ -1,278 +1,178 @@
 # Planeja+
 
-Projeto full stack com frontend em HTML, CSS e JavaScript, backend em Node.js + Express e MySQL como banco.
+Projeto full stack de controle financeiro.
 
-## Comandos de instalacao
+- Frontend: HTML, CSS e JavaScript
+- Backend: Node.js + Express
+- Banco de dados: MySQL
 
-### Frontend
+## Pre-requisitos
 
-Abra o arquivo `frontend/index.html` no navegador.
+- Node.js 18 ou superior
+- npm
+- MySQL rodando localmente
+- Navegador moderno
+- Conexao com internet para carregar CDNs do frontend:
+  - Axios
+  - Chart.js
+  - jsPDF
 
-Se preferir servir a pasta por HTTP:
+## Estrutura
+
+```text
+backend/
+  config/
+  controllers/
+  database/
+  middleware/
+  models/
+  routes/
+  app.js
+  server.js
+
+frontend/
+  css/
+  js/
+  index.html
+  login.html
+  cadastro.html
+  dashboard.html
+  categorias.html
+  movimentacoes.html
+  relatorios.html
+```
+
+## Configurar o backend
+
+Entre na pasta do backend:
+
+```bash
+cd backend
+```
+
+Instale as dependencias:
+
+```bash
+npm install
+```
+
+Crie o arquivo `.env` a partir do exemplo:
+
+```bash
+cp .env.example .env
+```
+
+No Windows PowerShell, se `cp` nao funcionar:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edite `backend/.env` com suas credenciais do MySQL:
+
+```env
+PORT=3000
+JWT_SECRET=troque_este_segredo_em_producao
+JWT_EXPIRES_IN=1d
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=sua_senha
+DB_NAME=planeja_plus
+```
+
+Crie o banco e as tabelas:
+
+```bash
+mysql -u root -p < database/schema.sql
+```
+
+Inicie a API:
+
+```bash
+npm run dev
+```
+
+No PowerShell, se houver bloqueio do `npm.ps1`, use:
+
+```powershell
+npm.cmd run dev
+```
+
+A API roda em:
+
+```text
+http://localhost:3000/api
+```
+
+Teste rapido:
+
+```text
+GET http://localhost:3000/api/health
+```
+
+## Rodar o frontend
+
+Com o backend ligado, abra `frontend/index.html` no navegador.
+
+Recomendado: servir a pasta por HTTP.
 
 ```bash
 cd frontend
 python -m http.server 5500
 ```
 
-Depois acesse:
+Acesse:
 
 ```text
 http://localhost:5500
 ```
 
-### Backend
+## Fluxo de uso
 
-```bash
-cd backend
-npm install
-cp .env.example .env
-npm run dev
-```
+1. Abra `cadastro.html` e crie uma conta.
+2. Ou abra `login.html` e entre com um usuario existente.
+3. Cadastre categorias em `categorias.html`.
+4. Cadastre movimentacoes em `movimentacoes.html`.
+5. Veja os graficos em `dashboard.html`.
+6. Gere PDF em `relatorios.html`.
 
-## Estrutura
-
-```text
-frontend/
-  index.html
-  dashboard.html
-  login.html
-  cadastro.html
-  categorias.html
-  movimentacoes.html
-  relatorios.html
-  css/
-    styles.css
-  js/
-    apiService.js
-    appUtils.js
-    login.js
-    cadastro.js
-    categorias.js
-    movimentacoes.js
-    dashboard.js
-    relatorios.js
-
-backend/
-  controllers/
-  models/
-  routes/
-  middleware/
-  database/
-```
-
-## Observacoes
-
-- A API possui apenas validacoes iniciais e CRUD basico.
-- Configure as credenciais do MySQL no arquivo `backend/.env`.
-- O frontend consome a API Express usando Axios via CDN.
-- Para usar as telas dinamicas, mantenha o backend rodando em `http://localhost:3000/api`.
-
-## Service Axios
-
-O arquivo `frontend/js/apiService.js` centraliza a comunicacao com a API Express.
-
-Para usar em uma pagina HTML, inclua o Axios antes do service:
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="./js/apiService.js"></script>
-```
-
-Metodos disponiveis:
+O token JWT fica salvo no `localStorage` com a chave:
 
 ```text
-ApiService.cadastro(dados)
-ApiService.login(dados)
-ApiService.listarCategorias()
-ApiService.criarCategoria(dados)
-ApiService.listarMovimentacoes()
-ApiService.criarMovimentacao(dados)
-ApiService.editarMovimentacao(id, dados)
-ApiService.excluirMovimentacao(id)
+planeja_token
 ```
 
-## Endpoints iniciais da API
-
-Base URL:
-
-```text
-http://localhost:3000/api
-```
+## Rotas da API
 
 Rotas publicas:
 
 ```text
-GET  /health
-POST /auth/cadastro
-POST /auth/login
+GET  /api/health
+POST /api/auth/cadastro
+POST /api/auth/login
 ```
 
 Rotas protegidas por JWT:
 
 ```text
-POST   /categorias
-GET    /categorias
-POST   /movimentacoes
-GET    /movimentacoes
-PUT    /movimentacoes/:id
-DELETE /movimentacoes/:id
+GET    /api/categorias
+POST   /api/categorias
+GET    /api/movimentacoes
+POST   /api/movimentacoes
+PUT    /api/movimentacoes/:id
+DELETE /api/movimentacoes/:id
 ```
 
-Nas rotas protegidas, envie o token no header:
+Header para rotas protegidas:
 
 ```text
 Authorization: Bearer seu_token_jwt
 ```
 
-## Testando o CRUD no Postman
+## Observacoes
 
-### 1. Cadastro
-
-```text
-POST http://localhost:3000/api/auth/cadastro
-```
-
-Body `raw` JSON:
-
-```json
-{
-  "nome": "Teste Usuario",
-  "email": "teste@planejamais.com",
-  "senha": "123456"
-}
-```
-
-Copie o `token` retornado.
-
-### 2. Login
-
-```text
-POST http://localhost:3000/api/auth/login
-```
-
-Body `raw` JSON:
-
-```json
-{
-  "email": "teste@planejamais.com",
-  "senha": "123456"
-}
-```
-
-Copie o `token` retornado e use nas proximas rotas.
-
-### 3. Criar categoria
-
-```text
-POST http://localhost:3000/api/categorias
-```
-
-Header:
-
-```text
-Authorization: Bearer seu_token_jwt
-```
-
-Body `raw` JSON:
-
-```json
-{
-  "nome": "Alimentacao",
-  "tipo": "despesa"
-}
-```
-
-Guarde o `id` retornado. Ele sera usado como `categoria_id` nas movimentacoes.
-
-### 4. Listar categorias
-
-```text
-GET http://localhost:3000/api/categorias
-```
-
-Header:
-
-```text
-Authorization: Bearer seu_token_jwt
-```
-
-Use um `id` dessa listagem ao criar uma movimentacao.
-
-### 5. Criar movimentacao
-
-```text
-POST http://localhost:3000/api/movimentacoes
-```
-
-Header:
-
-```text
-Authorization: Bearer seu_token_jwt
-```
-
-Body `raw` JSON:
-
-```json
-{
-  "categoria_id": 1,
-  "descricao": "Compra no mercado",
-  "valor": 150.75,
-  "tipo": "despesa",
-  "data_movimentacao": "2026-05-17"
-}
-```
-
-O `categoria_id` precisa pertencer ao usuario autenticado pelo token.
-
-### 6. Listar movimentacoes
-
-```text
-GET http://localhost:3000/api/movimentacoes
-```
-
-Header:
-
-```text
-Authorization: Bearer seu_token_jwt
-```
-
-### 7. Editar movimentacao
-
-```text
-PUT http://localhost:3000/api/movimentacoes/1
-```
-
-Header:
-
-```text
-Authorization: Bearer seu_token_jwt
-```
-
-Body `raw` JSON:
-
-```json
-{
-  "categoria_id": 1,
-  "descricao": "Compra no mercado atualizada",
-  "valor": 175.9,
-  "tipo": "despesa",
-  "data_movimentacao": "2026-05-17"
-}
-```
-
-Troque o `1` da URL pelo `id` real da movimentacao.
-
-### 8. Excluir movimentacao
-
-```text
-DELETE http://localhost:3000/api/movimentacoes/1
-```
-
-Header:
-
-```text
-Authorization: Bearer seu_token_jwt
-```
-
-Se a exclusao funcionar, a API retorna status `204 No Content`.
+- O frontend usa Axios em `frontend/js/apiService.js`.
+- O dashboard usa Chart.js com dados vindos da API.
+- A exportacao PDF usa jsPDF na tela de relatorios.
+- Arquivos `.env` e `node_modules` nao devem ser enviados ao Git.
